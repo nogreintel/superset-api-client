@@ -239,11 +239,11 @@ class ObjectFactories:
         response.raise_for_status()
         return response.json().get("id")
 
-    def import_file(self, file_path) -> int:
+    def import_file(self, file_path) -> bool:
         """Import a file on remote."""
         url = self.import_url
         
-        file = {'formData': (file_path, open(file_path, 'rb'), 'application/json')}
+        file = {'formData': (file_path, open(file_path, 'rb'), 'application/json'), 'overwrite': False}
         
         response = self.client.post(url, files = file)
         response.raise_for_status()
