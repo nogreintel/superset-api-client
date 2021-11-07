@@ -270,13 +270,12 @@ class ObjectFactories:
         else:
             return False
             
-    def export_file(self, file_path, overwrite=False) -> bool:
+    def export_file(self, export_id):
         """Export a file on remote."""
         url = self.export_url
         
-        file = {'formData': (file_path, open(file_path, 'rb'), 'application/json'), 'overwrite': overwrite}
+        response = self.client.get(url)
         
-        response = self.client.post(url, files = file)
         response.raise_for_status()
         """"""
         if response.json().get('message') == 'OK':
