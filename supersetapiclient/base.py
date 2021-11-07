@@ -64,6 +64,13 @@ class Object:
             self._parent.base_url,
             str(self.id)
         )
+        
+    @property
+    def export_url(self) -> str:
+        return self._parent.client.join_urls(
+            self._parent.base_url,
+            str(self.id)
+        )
 
     def fetch(self) -> None:
         """Fetch additional object information."""
@@ -153,6 +160,16 @@ class ObjectFactories:
             self.endpoint,
             "import"
         )
+        
+    @property
+    def export_url(self):
+        """Base url for these objects."""
+        return self.client.join_urls(
+            self.client.base_url,
+            self.endpoint,
+            "export"
+        )
+        
     @staticmethod
     def _handle_reponse_status(reponse: Response) -> None:
         """Handle response status."""
@@ -239,15 +256,29 @@ class ObjectFactories:
         response.raise_for_status()
         return response.json().get("id")
 
-    def import_file(self, file_path) -> bool:
+    def import_file(self, file_path, overwrite=False) -> bool:
         """Import a file on remote."""
         url = self.import_url
         
-        file = {'formData': (file_path, open(file_path, 'rb'), 'application/json'), 'overwrite': False}
+        file = {'formData': (file_path, open(file_path, 'rb'), 'application/json'), 'overwrite': overwrite}
         
         response = self.client.post(url, files = file)
         response.raise_for_status()
         """If import is successful, the following is returned: {'message': 'OK'}"""
+        if response.json().get('message') == 'OK':
+            return True
+        else:
+            return False
+            
+    def export_file(self, file_path, overwrite=False) -> bool:
+        """Export a file on remote."""
+        url = self.export_url
+        
+        file = {'formData': (file_path, open(file_path, 'rb'), 'application/json'), 'overwrite': overwrite}
+        
+        response = self.client.post(url, files = file)
+        response.raise_for_status()
+        """"""
         if response.json().get('message') == 'OK':
             return True
         else:
